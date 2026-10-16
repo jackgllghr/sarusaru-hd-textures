@@ -16,6 +16,27 @@ port. A takedown of this repository leaves the port and the
 [English translation](https://github.com/jackgllghr/sarusaru-translations)
 untouched.
 
+## Current pack
+
+**v1** (103 textures, about 41 MB) covers the boot screens, the autosave
+notice, the title and main menu in English and Japanese, name entry, the font
+atlases, the start of stage 1-1 (HUD, tutorial dialogue, beach scenery) and
+the title backdrop. Everything else is drawn as the original until later packs
+add it.
+
+It was upscaled with **[4x-HDCube](https://openmodeldb.info/models/4x-HDCube)**
+by Venomalia (ESRGAN, CC0-1.0), an ESRGAN model trained on GameCube and Wii
+textures, the same era and style as this game. HDCube was chosen over
+Real-ESRGAN x4plus and x4plus-anime-6B (BSD-3-Clause) after comparing the
+three on this game's textures:
+
+- It keeps surface detail such as sand grain and brickwork. The anime model
+  flattens that detail into flat colour, and x4plus smooths it away.
+- It gives the cleanest kanji in the font atlases, where both Real-ESRGAN
+  models invent strokes.
+- Its CC0 licence puts no conditions on the images it makes. 4x-UltraSharp
+  and 4x-AnimeSharp, the other common choices, are CC-BY-NC-SA.
+
 ## What the pack is
 
 A zip of one HD pack directory, in the format the recompilation's renderer
@@ -73,12 +94,34 @@ disc nor the intermediate dumps are published.
    out/macos-arm64/bin/sarusaru --dump-textures ~/sarusaru-dump '/path/to/game.iso'
    ```
 
-2. **Upscale.** Write `<hash>.png` at 4× for each texture into `pack/`, along
-   with `pack.ini` as above. Any upscaler works, as long as it handles colour
-   and alpha as separate straight planes. Alternatively, let the launcher make
-   a pack on the device from a recipe (`tools/build_texture_recipe.py`), then
-   copy its directory. Leave out text the game draws at runtime: those 256×64
-   4-bit textures change from frame to frame.
+   Movies are uploaded as textures too, so a dump also fills with 512×512
+   32-bit movie frames, about 1 MB each. Delete them as they appear on a
+   nearly full disk; the upscale script leaves them out anyway.
+
+2. **Upscale** with `scripts/upscale.py`. It runs any model
+   [spandrel](https://github.com/chaiNNer-org/spandrel) loads, on the Apple
+   GPU, CUDA or the CPU:
+
+   ```sh
+   python3 -m venv .venv && .venv/bin/pip install -r scripts/requirements.txt
+   curl -LO https://raw.githubusercontent.com/Venomalia/HDcube/main/v1/4x_HDCube_200k.pth
+   .venv/bin/python -I scripts/upscale.py --model 4x_HDCube_200k.pth \
+     --dump ~/sarusaru-dump [--dump ...] -o pack
+   ```
+
+   - **Planes:** colour and alpha are upscaled as separate straight planes,
+     with 8 texels of clamped padding that is cropped afterwards.
+   - **Visible texels** take their colour from a second upscale in which
+     hidden texels are filled from their neighbours, so cut-outs and atlases
+     don't get fringes. Hidden texels keep their stored colour, for textures
+     drawn with alpha off.
+   - **Small textures** (under 16 texels on a side) use Lanczos instead of the
+     model.
+   - **Left out:** text drawn at runtime (256×64 4-bit), movie frames, and
+     any hashes listed in `--skip`.
+   - **Reruns:** textures already in `pack/` are skipped, so the script can be
+     rerun as the dumps grow. It takes a few seconds per texture on an
+     Apple M4.
 
 3. **Check it in the game** before publishing:
 
