@@ -1,0 +1,5 @@
+# Packs are published as release assets, never committed.
+/pack/
+*.zip
+*.zip.partial
+.DS_Store
