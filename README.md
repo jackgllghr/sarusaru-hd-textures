@@ -185,6 +185,28 @@ for the font (or an explicit `--font` path). Run it after general upscaling,
 then package the pack as above. The generated PNGs remain local release
 artifacts, like the other HD textures.
 
+### Stage-select previews
+
+`scripts/build_stage_previews.py` redraws the 22 stage preview pictures on the
+stage-select screen as wax crayon drawings. Each preview is a 384×256 8-bit
+texture: the picture is the top 224 rows, with rounded transparent corners,
+and the rows below it are never drawn. The script upscales the picture with
+HDCube, using the same alpha handling as `upscale.py`, then restyles it. A
+Kuwahara filter flattens the colour into waxy hatching that lets the paper
+grain show through, with cross-hatching in the shadows and a soft, broken
+outline. The noise is seeded, so reruns produce identical images.
+
+Collect the previews by paging through every stage on the stage-select screen
+with texture dumping on. Then:
+
+```sh
+python3 -I scripts/build_stage_previews.py --model /path/to/4x_HDCube_200k.pth \
+  --dump /path/to/stage-select-dump -o pack
+```
+
+Run it after the general upscale script; it replaces the 22 hash-named
+previews and reports any that are missing from the dumps.
+
 ## Publishing
 
 Publish the zip as a release tagged `hd-<date or version>`:
