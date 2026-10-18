@@ -169,6 +169,22 @@ python3 scripts/upscale.py --model /path/to/4x_HDCube_200k.pth \
 
 The atlas also retains its other HUD regions and transparent texels.
 
+### Save-screen cursor and slot buttons
+
+`scripts/build_save_ui.py` draws the glove cursor and the four numbered save
+buttons at 4× using vector outlines and the game's M PLUS Rounded 1c Bold
+face. The original 32×24 cursor silhouette, 32×32 button cells and texture
+padding extents remain fixed. Both observed slot-atlas identities are included.
+
+```sh
+python3 scripts/build_save_ui.py -o pack
+```
+
+This requires Pillow, CairoSVG and the sibling `bigmission-recomp` checkout
+for the font (or an explicit `--font` path). Run it after general upscaling,
+then package the pack as above. The generated PNGs remain local release
+artifacts, like the other HD textures.
+
 ## Publishing
 
 Publish the zip as a release tagged `hd-<date or version>`:
