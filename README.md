@@ -141,6 +141,34 @@ disc nor the intermediate dumps are published.
 `pack/` and `*.zip` are ignored by git. Images are published only as release
 assets, never committed.
 
+### Aiming reticles
+
+`scripts/build_aiming_reticles.py` renders the geometric aiming marks directly
+at 4× resolution: the free-aim crosshair and circle, the enemy-targeted radial
+ticks, and their red and white center crosses. Vector geometry keeps the thin
+lines and circular edge smooth while preserving the original texel positions,
+transparent background, and straight RGB beneath transparent pixels.
+
+```sh
+pip install Pillow CairoSVG
+python3 scripts/build_aiming_reticles.py -o pack
+```
+
+Run this after the general upscale script, then package and verify the pack as
+above. It replaces only the four hash-named aiming textures. These changes do
+not update the published release or the launcher's pinned download.
+
+The top-left banana life counter uses atlas
+`a1fa91a72377409220d8751999d06040` (96×64). Its full, partly depleted, and empty
+banana icons are upscaled together to 384×256 with the normal HDCube pipeline:
+
+```sh
+python3 scripts/upscale.py --model /path/to/4x_HDCube_200k.pth \
+  --dump /path/to/gameplay-dump -o pack --only a1fa91a72377409220d8751999d06040
+```
+
+The atlas also retains its other HUD regions and transparent texels.
+
 ## Publishing
 
 Publish the zip as a release tagged `hd-<date or version>`:

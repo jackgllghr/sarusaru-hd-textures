@@ -2,3 +2,4 @@ torch
 spandrel
 pillow
 numpy
+CairoSVG
