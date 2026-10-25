@@ -207,6 +207,25 @@ python3 -I scripts/build_stage_previews.py --model /path/to/4x_HDCube_200k.pth \
 Run it after the general upscale script; it replaces the 22 hash-named
 previews and reports any that are missing from the dumps.
 
+### Smaller packs (2× and 3×)
+
+The recompilation's **Modern Low** preset renders at 2× (960×544) for phones
+and other low-power devices, and downloads a 3× pack; the Textures row also
+offers 2×. Both are the finished 4× pack resized, so they keep everything in
+it, the hand-drawn textures included:
+
+```sh
+python3 -I scripts/downscale_pack.py pack --scale 3 -o pack-3x
+python3 -I scripts/downscale_pack.py pack --scale 2 -o pack-2x
+```
+
+Colour and alpha are resized as separate straight planes with Lanczos.
+Visible texels take an alpha-weighted colour, so hidden colour doesn't fringe
+cut-outs; texels left fully transparent keep their own colour, for textures
+drawn with alpha off. Only Pillow is needed. Package each as above, as
+`sarusaru-hd-3x.zip` and `sarusaru-hd-2x.zip`, and pin them as
+`SARUSARU_HD3_PACK_*` and `SARUSARU_HD2_PACK_*`.
+
 ## Publishing
 
 Publish the zip as a release tagged `hd-<date or version>`:
